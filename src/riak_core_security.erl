@@ -446,11 +446,16 @@ get_ciphers() ->
 print_ciphers() ->
     Ciphers = get_ciphers(),
     {Good, Bad} = riak_core_ssl_util:parse_ciphers(Ciphers),
-    io:format("Configured ciphers~n~n~p~n~n", [Ciphers]),
-    io:format("Valid ciphers~n~n~p~n~n",
-              [riak_core_ssl_util:print_ciphers(Good)]),
-    io:format("Unknown/Unsupported ciphers~n~n~p~n~n",
-              [string:join(Bad, ":")]).
+    io:format("Configured ciphers~n~n~s~n~n", [Ciphers]),
+    io:format("Valid ciphers(~b)~n~n~s~n~n",
+              [length(Good), riak_core_ssl_util:print_ciphers(Good)]),
+    case Bad of
+        [] ->
+            ok;
+        _ ->
+            io:format("Unknown/Unsupported ciphers(~b)~n~n~s~n~n",
+                      [length(Bad), string:join(Bad, ":")])
+    end.
 
 set_ciphers(CipherList) ->
     case riak_core_ssl_util:parse_ciphers(CipherList) of
